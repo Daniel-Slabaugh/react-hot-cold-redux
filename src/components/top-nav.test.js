@@ -1,44 +1,33 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import {shallow} from 'enzyme';
 
-import {generateAuralUpdate, restartGame} from '../actions';
+import {TopNav} from './top-nav';
+import {RESTART_GAME, GENERATE_AURAL_UPDATE} from '../actions';
 
-import './top-nav.css';
+describe('<TopNav />', () => {
+    it('Renders without crashing', () => {
+        shallow(<TopNav />);
+    });
 
-export function TopNav(props) {
-    return (
-        <nav>
-            <ul className="clearfix">
-                <li>
-                    <a href="#what" className="what" aria-label="How to play">
-                        What?
-                    </a>
-                </li>
-                <li>
-                    <a
-                        href="#feedback"
-                        className="new"
-                        aria-label="Start a new game"
-                        onClick={() =>
-                            props.dispatch(
-                                restartGame(Math.floor(Math.random() * 100) + 1)
-                            )}>
-                        + New Game
-                    </a>
-                </li>
-                <li>
-                    <a
-                        href="#get-status"
-                        /* the `visuallyhidden` class hides an element 
-            while leaving it available to screen reader users  */
-                        className="visuallyhidden focusable status-link"
-                        onClick={() => props.dispatch(generateAuralUpdate())}>
-                        Hear state of game
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    );
-}
+    it('Should dispatch restartGame when new game is clicked', () => {
+        const dispatch = jest.fn();
+        const wrapper = shallow(<TopNav dispatch={dispatch} />);
+        const link = wrapper.find('.new');
+        link.simulate('click');
+        expect(dispatch).toHaveBeenCalled();
+        const action = dispatch.mock.calls[0][0];
+        expect(action.type).toEqual(RESTART_GAME);
+        expect(action.correctAnswer).toBeGreaterThanOrEqual(0);
+        expect(action.correctAnswer).toBeLessThanOrEqual(100);
+    });
 
-export default connect()(TopNav);
+    it('Should dispatch generateAuralUpdate when new game is clicked', () => {
+        const dispatch = jest.fn();
+        const wrapper = shallow(<TopNav dispatch={dispatch} />);
+        const link = wrapper.find('.status-link');
+        link.simulate('click');
+        expect(dispatch).toHaveBeenCalled();
+        expect(dispatch.mock.calls[0][0].type).toEqual(GENERATE_AURAL_UPDATE);
+    });
+});
+
