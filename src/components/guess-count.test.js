@@ -14,3 +14,4 @@ describe('<GuessCount />', () => {
     expect(wrapper.text()).toEqual(`You've made ${value} guesses!`);
   });
 });
+g
